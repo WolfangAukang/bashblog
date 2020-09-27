@@ -570,7 +570,7 @@ write_entry() {
         [[ $extension == md || $extension == html ]] && fmt=$extension
         # but let user override it (`bb.sh post -html file.md`)
         [[ $2 == -html ]] && fmt=html
-        filename=$f
+        set_name=1
         # Test if Markdown is working before re-posting a .md file
         if [[ $extension == md ]]; then
             test_markdown
@@ -604,8 +604,8 @@ EOF
         [[ ! $direct ]] && $EDITOR "$TMPFILE" || post_status="P" ## Direct avoids all prompts
         if [[ $fmt == md ]]; then
             html_from_md=$(markdown "$TMPFILE")
-            if [[ -n $filename ]]; then
-                parse_file "$html_from_md" "" "$filename"
+            if [[ -n $set_name ]]; then
+                parse_file "$html_from_md" "" "$f"
             else
                 parse_file "$html_from_md"
             fi
