@@ -570,6 +570,7 @@ write_entry() {
         [[ $extension == md || $extension == html ]] && fmt=$extension
         # but let user override it (`bb.sh post -html file.md`)
         [[ $2 == -html ]] && fmt=html
+        filename=$f
         # Test if Markdown is working before re-posting a .md file
         if [[ $extension == md ]]; then
             test_markdown
@@ -598,13 +599,16 @@ EOF
     chmod 600 "$TMPFILE"
 
     post_status="E"
-    filename=""
     while [[ $post_status != "p" && $post_status != "P" ]]; do
         [[ -n $filename ]] && rm "$filename" # Delete the generated html file, if any
         [[ ! $direct ]] && $EDITOR "$TMPFILE" || post_status="P" ## Direct avoids all prompts
         if [[ $fmt == md ]]; then
             html_from_md=$(markdown "$TMPFILE")
-            parse_file "$html_from_md"
+            if [[ -n $filename ]]; then
+                parse_file "$html_from_md" "" "$filename"
+            else
+                parse_file "$html_from_md"
+            fi
             rm "$html_from_md"
         else
             parse_file "$TMPFILE" # this command sets $filename as the html processed file
